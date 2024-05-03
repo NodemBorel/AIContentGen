@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Content Generation Tool</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .form-section {
+            display: none;
+        }
+
+        #noOptionMessage {
+            display: none;
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            position: fixed;
+            /*top: 50%;
+            left: 50%;*/
+            transform: translate(-50%, -50%);
+            padding: 10px;
+            background-color: rgba(255, 0, 0, 0.1);
+            border: 2px solid red;
+            border-radius: 5px;
+            animation: pulse 0.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Choose Form Selector -->
+    <h1>Choose Content Type :</h1>
+    <select id="formSelector" onchange="showForm()">
+        <option value="">Select an option...</option>
+        <option value="article">Article Generation</option>
+        <option value="product">Product Description Generation</option>
+        <option value="summary">Summary Generation</option>
+    </select>
+
+    <!-- Message for No Option Chosen -->
+    <p id="noOptionMessage">
+        Please select a content type from above to proceed.
+    </p>
+
+    <!-- Article Generation Form -->
+    <div id="articleForm" class="form-section">
+        <h1>AI Content Generation Tool</h1>
+        <form action="/generate" method="POST">
+            <label for="topic">Topic:</label>
+            <input type="text" id="topic" name="topic" required><br><br>
+        
+            <label for="tone">Tone:</label>
+            <select id="tone" name="tone" required>
+                <option value="formal">Formal</option>
+                <option value="casual">Casual</option>
+                <option value="professional">Professional</option>
+                <option value="persuasive">Persuasive</option>
+                <option value="informative">Informative</option>
+                <option value="friendly">Friendly</option>
+            </select><br><br>
+        
+            <label for="impact">Target Audience/Impact:</label>
+            <select id="impact" name="impact" required>
+                <option value="marketing">Marketing</option>
+                <option value="educational">Educational</option>
+                <option value="informational">Informational</option>
+            </select><br><br>
+        
+            <label for="desired_length">Desired Length (words/character limit):</label>
+            <input type="number" id="desired_length" name="desired_length" required><br><br>
+        
+            <label for="word_count">Word Count (words/character limit):</label>
+            <input type="number" id="word_count" name="word_count" required><br><br>
+        
+            <label for="content_style">Content Style:</label>
+            <select id="content_style" name="content_style" required>
+                <option value="narrative">Narrative Storytelling</option>
+                <option value="descriptive">Descriptive Writing</option>
+                <option value="listicle">Listicle Format</option>
+                <option value="technical">Technical Content</option>
+            </select><br><br>
+        
+            <label for="keywords">Keywords:</label>
+            <input type="text" id="keywords" name="keywords"><br><br>
+        
+            <button type="submit">Generate Content</button>
+        </form>
+    </div>
+
+    <!-- Product Description Generation Form -->
+    <div id="productForm" class="form-section">
+        <h1>Product Description Generation</h1>
+        <form action="/generate_product_description" method="post">
+            <label for="product_category">Product Category:</label><br>
+            <input type="text" id="product_category" name="product_category" required><br><br>
+            
+            <label for="product_features">Product Features:</label><br>
+            <textarea id="product_features" name="product_features" rows="4" cols="50" required></textarea><br><br>
+            
+            <label for="target_audience">Target Audience:</label><br>
+            <input type="text" id="target_audience" name="target_audience" required><br><br>
+            
+            <label for="tone_style">Tone & Style:</label><br>
+            <select id="tone_style" name="tone_style" required>
+                <option value="formal">Formal</option>
+                <option value="casual">Casual</option>
+                <option value="professional">Professional</option>
+            </select><br><br>
+            
+            <label for="key_features">Key Features:</label><br>
+            <textarea id="key_features" name="key_features" rows="4" cols="50" required></textarea><br><br>
+            
+            <label for="benefits">Benefits:</label><br>
+            <textarea id="benefits" name="benefits" rows="4" cols="50" required></textarea><br><br>
+            
+            <label for="use_cases">Use Cases:</label><br>
+            <textarea id="use_cases" name="use_cases" rows="4" cols="50" required></textarea><br><br>
+            
+            <button type="submit">Generate Product Description</button>
+        </form>
+    </div>
+
+    <!-- Summary Generation Form -->
+    <div id="summaryForm" class="form-section">
+        <h1>Summary Generation</h1>
+        <form action="/generate_summary" method="post">
+            <label for="text_to_summarize">Text to Summarize:</label><br>
+            <textarea id="text_to_summarize" name="text_to_summarize" rows="6" cols="50" required></textarea><br><br>
+            
+            <label for="summary_length">Summary Length:</label><br>
+            <input type="number" id="summary_length" name="summary_length" min="1" max="1000" required> sentences<br><br>
+            
+            <label for="summary_focus">Summary Focus:</label><br>
+            <input type="text" id="summary_focus" name="summary_focus" required><br><br>
+            
+            <button type="submit">Generate Summary</button>
+        </form>
+    </div>
+
+    <!-- JavaScript to Show/Hide Forms -->
+    <script>
+        function showForm() {
+            var selectedForm = document.getElementById("formSelector").value;
+            var forms = document.getElementsByClassName("form-section");
+            var noOptionMessage = document.getElementById("noOptionMessage");
+
+            // Hide all forms
+            for (var i = 0; i < forms.length; i++) {
+                forms[i].style.display = "none";
+            }
+
+            // Show selected form or display message if no option is selected
+            if (selectedForm !== "") {
+                document.getElementById(selectedForm + "Form").style.display = "block";
+                noOptionMessage.style.display = "none"; // Hide the no option message
+            } else {
+                noOptionMessage.style.display = "block"; // Show the no option message
+            }
+        }
+
+        // Initialize to hide all forms and show no option message
+        showForm();
+    </script>
+</body>
+</html>
